@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { ModelContext } from "../context/ModelContext";
 import { signUpAPI } from "../services/api";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const { loginHandler, closeModelHandler } = useContext(ModelContext);
@@ -45,7 +45,7 @@ const SignUp = () => {
       newErrors.password = "Password must be at least 8 characters long";
     } else if (
       !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/.test(
-        data.password
+        data.password,
       )
     ) {
       newErrors.password =
@@ -73,7 +73,7 @@ const SignUp = () => {
   return (
     <div
       onClick={closeModelHandler}
-      className="fixed top-0 bottom-0 left-0 right-0 z-100 flex items-center text-sm bg-gray-900/40"
+      className="fixed inset-0 z-50 flex items-center text-sm bg-gray-900/40"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -149,21 +149,27 @@ const SignUp = () => {
           <button
             type="submit"
             disabled={loading}
-            className="mt-4 w-full py-3 text-center bg-blue-500 rounded-lg text-white hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
+            className="mt-4 w-full py-3 flex items-center justify-center gap-2 bg-blue-500 rounded-lg text-white hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
           >
-            {loading ? "Creating Account..." : "SignUp"}
+            {loading ? (
+              <>
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                Creating Account...
+              </>
+            ) : (
+              "SignUp"
+            )}
           </button>
-          <ToastContainer />
 
           <p className="text-center text-gray-500">
             Already have an account?{" "}
-            <a
+            <button
+              type="button"
               onClick={loginHandler}
-              href="#"
               className="text-blue-500 font-bold cursor-pointer hover:underline"
             >
               Login
-            </a>
+            </button>
           </p>
         </form>
       </div>

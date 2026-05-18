@@ -1,16 +1,17 @@
 import React, { useContext } from "react";
-import { GrAdd, GrUpdate, GrUndo } from "react-icons/gr";
+import { GrAdd, GrUndo } from "react-icons/gr";
 import { MdDownloadDone } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import { RiDeleteBinLine } from "react-icons/ri";
 
-import { AuthConetext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import { TodoContext } from "../context/TodoContext";
 import { createTodoAPI, updateTodoAPI, deleteTodoAPI } from "../services/api";
-import { ToastContainer, toast } from "react-toastify";
+
+import { toast } from "react-toastify";
 
 const Todo = () => {
-  const { isLoggedIn, loginHandler } = useContext(AuthConetext);
+  const { isLoggedIn, loginHandler } = useContext(AuthContext);
 
   const {
     todo,
@@ -31,14 +32,12 @@ const Todo = () => {
     e.preventDefault();
 
     if (!isLoggedIn) {
-      loginHandler(e);
+      loginHandler();
       return;
     }
 
-    console.log(todo);
-
-    const title = todo.title;
-    const description = todo.description;
+    const title = todo.title.trim();
+    const description = todo.description.trim();
 
     if (!title) {
       toast.error("Write something to add!");
@@ -49,12 +48,13 @@ const Todo = () => {
       if (editingId !== null) {
         const response = await updateTodoAPI(editingId, {
           title,
-          description:description,
+          description,
         });
 
         updateTodoInState(editingId, response.todo || response.data);
+
         setEditingId(null);
-        // alert("Todo updated successfully!");
+
         toast.success("Todo updated successfully!");
       } else {
         const response = await createTodoAPI({
@@ -63,27 +63,37 @@ const Todo = () => {
         });
 
         addTodoToState(response.todo || response.data);
+
         toast.success("Todo created successfully!");
       }
-      setTodo({ title: "", description: "" });
+
+      setTodo({
+        title: "",
+        description: "",
+      });
     } catch (error) {
-      // alert(error.message || "Failed to save todo");
       toast.error(error.message || "Failed to save todo!");
     }
   }
 
-  // Delete todo
   async function deleteHandler(id) {
-    if (!window.confirm("Are you sure you want to delete this todo?")) {
-      return;
-    }
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this todo?",
+    );
+
+    if (!confirmDelete) return;
 
     try {
       await deleteTodoAPI(id);
+
       removeTodoFromState(id);
 
       if (editingId === id) {
-        setTodo({ title: "", description: "" });
+        setTodo({
+          title: "",
+          description: "",
+        });
+
         setEditingId(null);
       }
 
@@ -93,13 +103,12 @@ const Todo = () => {
     }
   }
 
-  // done todo
   async function handleDoneToggle(id, currentStatus) {
-    console.log(currentStatus)
     try {
       await updateTodoAPI(id, {
         isComplete: !currentStatus,
       });
+
       doneHandler(id);
     } catch (error) {
       toast.error(error.message || "Failed to update todo status");
@@ -107,121 +116,155 @@ const Todo = () => {
   }
 
   return (
-    <>
-      <div className="max-w-5xl mx-auto mt-8 px-4">
-        <form
-          onSubmit={submitHandler}
-          action=""
-          className="flex flex-col gap-3 my-14"
-        >
-          <div className="flex gap-3">
+    <div className="min-h-screen bg-gray-100 py-10 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-10">
+          <h1 className="text-4xl font-black text-gray-900">
+            Stay productive every day.
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            A clean space for your tasks, ideas, and priorities.
+          </p>
+        </div>
+
+        {/* Form Card */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+          <form onSubmit={submitHandler} className="flex flex-col gap-4">
             <input
               type="text"
               name="title"
               autoComplete="off"
-              placeholder="Title"
+              placeholder="Enter todo title..."
+              value={todo.title || ""}
               onChange={inputHandler}
-              value={todo.title}
-              className="flex-1 font-bold focus:outline-blue-400 rounded-xl border-2 border-gray-300 px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-4 text-lg font-semibold text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            />
+
+            <textarea
+              name="description"
+              rows="4"
+              autoComplete="off"
+              placeholder="Write description..."
+              value={todo.description || ""}
+              onChange={inputHandler}
+              className="w-full resize-none rounded-lg border border-gray-300 bg-gray-50 px-4 py-4 text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             />
 
             <button
               type="submit"
               disabled={loading}
-              className="flex items-center gap-2 py-2 px-6 border font-semibold rounded-md text-white bg-gray-900 border-amber-50 hover:bg-gray-800 disabled:bg-gray-500 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-2 rounded-lg bg-gray-900 px-6 py-4 text-white font-semibold hover:bg-gray-800 transition-all duration-200 disabled:opacity-50"
             >
               <span className="text-sm">
                 {editingId !== null ? <GrUndo /> : <GrAdd />}
               </span>
-              {editingId !== null ? "Update" : "Add"}
+
+              {editingId !== null ? "Update Todo" : "Add Todo"}
             </button>
-            <ToastContainer />
-          </div>
+          </form>
+        </div>
 
-          <input
-            name="description"
-            placeholder="Add description"
-            onChange={inputHandler}
-            value={todo.description}
-            autoComplete="off"
-            className="w-full focus:outline-blue-400 rounded-xl border-2 border-gray-300 px-3 py-2"
-          />
-        </form>
-
-        {/* Loading indicator */}
+        {/* Loading */}
         {loading && (
-          <div className="text-center py-4 text-gray-500">Loading todos...</div>
+          <div className="text-center py-10 text-gray-500 font-medium">
+            Loading todos...
+          </div>
         )}
 
-        {/* if user is not logged in or has no todos */}
+        {/* Empty State */}
         {!loading && todoData.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <p className="text-lg">No todos yet!</p>
-            <p className="text-sm mt-2">
+          <div className="bg-white border border-dashed border-gray-300 rounded-xl p-10 text-center">
+            <p className="text-2xl font-bold text-gray-700">No todos yet</p>
+
+            <p className="text-gray-500 mt-2">
               {isLoggedIn
-                ? "Create your first todo above"
-                : "Please log in to manage your todos"}
+                ? "Create your first todo above."
+                : "Login to manage your todos."}
             </p>
           </div>
         )}
 
-        <div>
-          <ul className="flex flex-col space-y-4">
-            {todoData.map((item) => (
-              <li
-                key={item._id || item.id}
-                className="w-full flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border-b-2 pb-4 border-gray-200"
+        {/* Todo List */}
+        <div className="space-y-5">
+          {todoData.map((item) => {
+            const todoId = item._id || item.id;
+
+            return (
+              <div
+                key={todoId}
+                className={`bg-white border rounded-xl p-5 shadow-sm transition-all duration-200 hover:shadow-md ${
+                  item.isComplete
+                    ? "border-blue-200 bg-blue-50/40"
+                    : "border-gray-200"
+                }`}
               >
-                <button
-                  onClick={() =>
-                    handleDoneToggle(item._id || item.id, item.isComplete)
-                  }
-                  className="flex items-center gap-1 bg-blue-500 text-sm font-semibold py-2 px-4 rounded-md text-white self-start sm:self-auto hover:bg-blue-600"
-                >
-                  <span className="text-lg">
-                    {item.isComplete ? <GrUndo /> : <MdDownloadDone />}
-                  </span>
-                  {item.isComplete ? "Undo" : "Done"}
-                </button>
-
-                <div
-                  className="w-full sm:flex-1 px-0 sm:px-8"
-                  style={{
-                    textDecoration: item.isComplete ? "line-through" : "",
-                    opacity: item.isComplete ? 0.6 : 1,
-                  }}
-                >
-                  <p className="font-semibold">{item.title}</p>
-                  <p className="text-gray-600">{item.description}</p>
-                </div>
-
-                <div className="flex gap-4 items-center">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    disabled={item.isComplete}
-                    className="flex items-center gap-1 py-2 text-sm font-semibold px-6 border rounded-md text-white bg-gray-900 border-amber-50 hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+                  {/* Left Content */}
+                  <div
+                    className="flex-1"
+                    style={{
+                      textDecoration: item.isComplete ? "line-through" : "none",
+                      opacity: item.isComplete ? 0.65 : 1,
+                    }}
                   >
-                    <span className="text-lg">
+                    <h2 className="text-lg font-medium text-gray-900">
+                      {item.title}
+                    </h2>
+
+                    <p className="text-gray-600 mt-2 leading-relaxed">
+                      {item.description || "No description"}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-wrap gap-3">
+                    {/* Done */}
+                    <button
+                      type="button"
+                      onClick={() => handleDoneToggle(todoId, item.isComplete)}
+                      className={`flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold text-white transition ${
+                        item.isComplete
+                          ? "bg-gray-700 hover:bg-gray-800"
+                          : "bg-green-700 hover:bg-green-800"
+                      }`}
+                    >
+                      <span className="text-base">
+                        {item.isComplete ? <GrUndo /> : <MdDownloadDone />}
+                      </span>
+
+                      {item.isComplete ? "Undo" : "Done"}
+                    </button>
+
+                    {/* Edit */}
+                    <button
+                      type="button"
+                      onClick={() => handleEdit(item)}
+                      disabled={item.isComplete}
+                      className="flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:bg-gray-400"
+                    >
                       <FaRegEdit />
-                    </span>
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => deleteHandler(item._id || item.id)}
-                    className="flex items-center gap-1 py-2 text-sm font-semibold px-4 rounded-md text-white bg-blue-500 hover:bg-blue-600"
-                  >
-                    <span className="text-lg">
+                      Edit
+                    </button>
+
+                    {/* Delete */}
+                    <button
+                      type="button"
+                      onClick={() => deleteHandler(todoId)}
+                      className="flex items-center gap-2 rounded-lg bg-red-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-800"
+                    >
                       <RiDeleteBinLine />
-                    </span>
-                    Delete
-                  </button>
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              </li>
-            ))}
-          </ul>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

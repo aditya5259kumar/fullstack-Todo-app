@@ -1,16 +1,15 @@
 import { useContext } from "react";
 import { RiFileList3Fill } from "react-icons/ri";
 import { MdLogin, MdLogout } from "react-icons/md";
-import defaultUser from "../assets/defaultUser.jpg";
 
-import { AuthConetext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import { ModelContext } from "../context/ModelContext";
 import UserProfile from "./UserProfile";
 import LogIn from "./LogIn";
 import SignUp from "./SignUp";
 
 const Navbar = () => {
-  const { isLoggedIn, currentUser, handleLogout } = useContext(AuthConetext);
+  const { isLoggedIn, currentUser, handleLogout } = useContext(AuthContext);
 
   const {
     showLogin,
@@ -21,14 +20,22 @@ const Navbar = () => {
     profileHandler,
   } = useContext(ModelContext);
 
-  function logoutHandler(e) {
-    e.preventDefault();
-    if (window.confirm("Are you sure you want to logout?")) {
-      handleLogout();
-    }
-  }
+  // function logoutHandler(e) {
+  //   e.preventDefault();
+  //   if (window.confirm("Are you sure you want to logout?")) {
+  //     handleLogout();
+  //   }
+  // }
 
   // console.log(currentUser.user_profile.name)
+
+  const UserName = currentUser?.user_profile?.name
+    ?.split(" ")
+    .filter(Boolean)
+    .map((word) => word[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <header className="bg-gray-900">
@@ -46,38 +53,34 @@ const Navbar = () => {
             {isLoggedIn && (
               <div
                 onClick={profileHandler}
-                className="flex items-center gap-2 cursor-pointer hover:brightness-90 transition-all"
+                className="group flex items-center gap-2 cursor-pointer hover:brightness-90 transition-all"
               >
-                <div className="cursor-pointer relative w-8 h-8 ">
-                  <img
-                    src={defaultUser}
-                    alt="user pfp"
-                    className="w-full h-full object-cover rounded-full shadow-lg"
-                  />
+                <div className="p-2 flex items-center justify-center bg-purple-600 text-white font-bold text-[14px] cursor-pointer relative w-10 h-10 rounded-full shadow-lg">
+                  {UserName}
                 </div>
-                <p className="text-sm font-bold text-gray-200">
-                  {currentUser?.user_profile?.name || "User"}
+                <p className="hidden sm:flex group-hover:underline text-white font-semibold">
+                  {currentUser?.user_profile?.name}
                 </p>
               </div>
             )}
 
-            {!isLoggedIn && (
+            {/* {!isLoggedIn && (
               <a
                 onClick={loginHandler}
                 className="text-sm py-2 px-5 font-semibold rounded-md text-gray-300 hover:text-white transition cursor-pointer"
               >
                 Login
               </a>
-            )}
+            )} */}
 
             <button
-              onClick={isLoggedIn ? logoutHandler : signupHandler}
-              className="flex items-center gap-1 text-sm py-2 px-5 font-semibold rounded-md text-white bg-blue-500 hover:bg-blue-600 transition"
-            >
+  onClick={loginHandler}
+  className={`${isLoggedIn ? "hidden" : "flex"} items-center gap-1 text-sm py-2 px-5 font-semibold rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition`}
+>
+              LogIn{" "}
               <span className="text-lg">
-                {isLoggedIn ? <MdLogout /> : <MdLogin />}
+                <MdLogin />
               </span>
-              {isLoggedIn ? "LogOut" : "SignIn"}
             </button>
           </div>
         </div>

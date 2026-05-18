@@ -1,11 +1,11 @@
 import { useState, useContext } from "react";
 import { ModelContext } from "../context/ModelContext";
-import { AuthConetext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 import { logInAPI } from "../services/api";
 
 const LogIn = () => {
   const { signupHandler, closeModelHandler } = useContext(ModelContext);
-  const { setUserLoggedIn } = useContext(AuthConetext);
+  const { setUserLoggedIn } = useContext(AuthContext);
 
   const [data, setData] = useState({ email: "", password: "" });
   const [passwordShow, setpasswordShow] = useState(false);
@@ -45,18 +45,20 @@ const LogIn = () => {
 
         const response = await logInAPI(data);
 
-        console.log("Login response:", response);
+        // console.log("Login response:", response);
 
-        const storedToken = localStorage.getItem("authToken------------");
-        console.log("Token stored:", storedToken ? "Yes" : "No");
+        const storedToken = localStorage.getItem("authToken");
+        // console.log("Token stored:", storedToken ? "Yes" : "No");
 
         if (!storedToken) {
           throw new Error(
-            "Token was not saved. Please check your backend response."
+            "Token was not saved. Please check your backend response.",
           );
         }
 
-        setUserLoggedIn(response.user || response.data || response);
+        setUserLoggedIn(response.data);
+        // console.log("response.data===========", response.data);
+        await setUserLoggedIn();
       } catch (error) {
         console.error("Login error:", error);
         setApiError(error.message || "Invalid email or password");
@@ -73,7 +75,7 @@ const LogIn = () => {
   return (
     <div
       onClick={closeModelHandler}
-      className="fixed top-0 bottom-0 left-0 right-0 z-100 flex items-center text-sm bg-gray-900/40"
+      className="fixed inset-0 z-50 flex items-center text-sm bg-gray-900/40"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -131,19 +133,27 @@ const LogIn = () => {
           <button
             type="submit"
             disabled={loading}
-            className="mt-4 w-full py-3 text-center bg-blue-500 rounded-lg text-white hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
+            className="mt-4 w-full py-3 flex items-center justify-center gap-2 bg-blue-500 rounded-lg text-white hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? (
+              <>
+                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                Logging in...
+              </>
+            ) : (
+              "Login"
+            )}
           </button>
 
           <p className="text-center text-gray-500">
             don't have account?{" "}
-            <a
+            <button
+              type="button"
               onClick={signupHandler}
               className="text-blue-500 font-bold cursor-pointer hover:underline"
             >
               SignUp
-            </a>
+            </button>
           </p>
         </form>
       </div>

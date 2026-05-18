@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AuthConetext } from "./AuthContext";
+import { AuthContext } from "./AuthContext";
 import { ModelContext } from "./ModelContext";
 import { TodoContext } from "./TodoContext";
 import { myProfileAPI, getTodosAPI, logoutUser } from "../services/api";
@@ -13,27 +13,32 @@ function TodoProvider({ children }) {
   const [showSignUp, setshowSignUp] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
 
-  const [todo, setTodo] = useState({ title: "", desc: "" });
+  const [todo, setTodo] = useState({
+    title: "",
+    description: "",
+  });
   const [todoData, setTodoData] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
+
     if (!token) return;
 
     async function fetchProfile() {
       try {
         const response = await myProfileAPI();
+
         setCurrentUser(response.data);
         setisLoggedIn(true);
       } catch (err) {
-        handleLogout(); // token invalid
+        handleLogout();
       }
     }
 
     fetchProfile();
-  }, [isLoggedIn]);
+  }, []);
 
   // Check if user is logged in on mount
   useEffect(() => {
@@ -74,15 +79,13 @@ function TodoProvider({ children }) {
   }
 
   // --------------login handler----------------
-  function loginHandler(e) {
-    e.preventDefault();
+  function loginHandler() {
     setshowLogin(true);
     setshowSignUp(false);
   }
 
   // --------------signup handler----------------
-  function signupHandler(e) {
-    e.preventDefault();
+  function signupHandler() {
     setshowLogin(false);
     setshowSignUp(true);
   }
@@ -106,22 +109,31 @@ function TodoProvider({ children }) {
     setisLoggedIn(false);
     setCurrentUser(null);
     setTodoData([]);
-    setTodo({ title: "", desc: "" });
+    setTodo({
+      title: "",
+      description: "",
+    });
     setEditingId(null);
     closeModelHandler();
   }
 
   // Set logged in state and user data
-  async function setUserLoggedIn(userData) {
+  async function setUserLoggedIn() {
+  try {
     setisLoggedIn(true);
-    setCurrentUser(userData);
+
+    const response = await myProfileAPI();
+
+    setCurrentUser(response.data);
+
     closeModelHandler();
 
-    // Wait a bit for localStorage to be set, then fetch todos
-    setTimeout(() => {
-      fetchTodos();
-    }, 100);
+    fetchTodos();
+  } catch (err) {
+    console.error(err);
+    handleLogout();
   }
+}
 
   // --------------input handler----------------
   function inputHandler(e) {
@@ -141,16 +153,18 @@ function TodoProvider({ children }) {
 
   // ----------------done handler (placeholder)----------------
   function doneHandler(id) {
-    setTodoData((todoData) =>
-      todoData.map((item) =>
-        item.id === id ? { ...item, isComplete: !item.isComplete } : item
-      )
+    setTodoData((prev) =>
+      prev.map((item) =>
+        item.id === id || item._id === id
+          ? { ...item, isComplete: !item.isComplete }
+          : item,
+      ),
     );
   }
 
   // ----------------edit handler----------------
   function handleEdit(item) {
-    console.log(item);
+    // console.log(item);
     setTodo({ title: item.title, description: item.description });
     setEditingId(item.id || item._id);
   }
@@ -169,21 +183,21 @@ function TodoProvider({ children }) {
   function updateTodoInState(id, updatedTodo) {
     setTodoData((prev) =>
       prev.map((item) =>
-        item.id === id || item._id === id ? { ...item, ...updatedTodo } : item
-      )
+        item.id === id || item._id === id ? { ...item, ...updatedTodo } : item,
+      ),
     );
   }
 
   // Remove a todo from local state (after API success)
   function removeTodoFromState(id) {
     setTodoData((prev) =>
-      prev.filter((item) => item.id !== id && item._id !== id)
+      prev.filter((item) => item.id !== id && item._id !== id),
     );
   }
 
   return (
     <>
-      <AuthConetext.Provider
+      <AuthContext.Provider
         value={{
           isLoggedIn,
           loginHandler,
@@ -225,7 +239,7 @@ function TodoProvider({ children }) {
             {children}
           </TodoContext.Provider>
         </ModelContext.Provider>
-      </AuthConetext.Provider>
+      </AuthContext.Provider>
     </>
   );
 }
