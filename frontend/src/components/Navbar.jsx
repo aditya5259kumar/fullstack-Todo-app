@@ -51,17 +51,24 @@ const Navbar = () => {
           <div className="flex items-center space-x-4">
             {/* user profile */}
             {isLoggedIn && (
-              <div
-                onClick={profileHandler}
-                className="group flex items-center gap-2 cursor-pointer hover:brightness-90 transition-all"
-              >
-                <div className="p-2 flex items-center justify-center bg-purple-600 text-white font-bold text-[14px] cursor-pointer relative w-10 h-10 rounded-full shadow-lg">
-                  {UserName}
-                </div>
-                <p className="hidden sm:flex group-hover:underline text-white font-semibold">
-                  {currentUser?.user_profile?.name}
-                </p>
-              </div>
+              <>
+                {currentUser?.user_profile ? (
+                  <div
+                    onClick={profileHandler}
+                    className="group flex items-center gap-2 cursor-pointer hover:brightness-90 transition-all"
+                  >
+                    <div className="p-2 flex items-center justify-center bg-purple-600 text-white font-bold text-[14px] relative w-10 h-10 rounded-full shadow-lg">
+                      {UserName}
+                    </div>
+
+                    <p className="hidden sm:flex group-hover:underline text-white font-semibold">
+                      {currentUser.user_profile.name}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-white text-sm font-medium">Loading...</p>
+                )}
+              </>
             )}
 
             {/* {!isLoggedIn && (
