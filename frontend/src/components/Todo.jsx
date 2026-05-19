@@ -120,7 +120,7 @@ const Todo = () => {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-10">
-          <h1 className="text-4xl font-black text-gray-900">
+          <h1 className="text-4xl font-bold text-gray-900">
             Stay productive every day.
           </h1>
 
