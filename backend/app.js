@@ -15,7 +15,7 @@ var usersRouter = require("./routes/users");
 const authRoutes = require("./routes/authRoutes");
 
 var app = express();
-const port = process.env.PORT || 5500;
+// const port = process.env.PORT || 5500;
 
 // lets handle cors policy issue
 const corsOptions = {
@@ -65,8 +65,8 @@ app.get("/", (req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Example app listening at http://localhost:${port}`);
+// });
 
 module.exports = app;
