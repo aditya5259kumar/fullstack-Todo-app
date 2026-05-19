@@ -1,5 +1,5 @@
 
-const API_BASE_URL = "http://localhost:5500/api/user";
+const API_BASE_URL = "https://fullstack-todo-app-grtj.onrender.com/api/user";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");

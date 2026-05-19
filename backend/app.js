@@ -19,7 +19,7 @@ var app = express();
 
 // lets handle cors policy issue
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "https://fullstack-todo-app-nu.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD"],
   credentials: true,
 };
