@@ -116,15 +116,15 @@ const Todo = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
+    <div className="min-h-screen bg-gray-100 py-10 px-4 mt-12">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-900">
+        <div className="mb-8">
+          <h1 className="md:text-4xl text-2xl font-bold text-gray-900">
             Stay productive every day.
           </h1>
 
-          <p className="text-gray-500 mt-2">
+          <p className="text-gray-500 md:text-base text-sm mt-2">
             A clean space for your tasks, ideas, and priorities.
           </p>
         </div>

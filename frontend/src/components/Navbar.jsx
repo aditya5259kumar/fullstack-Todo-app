@@ -15,7 +15,7 @@ const Navbar = () => {
     showLogin,
     loginHandler,
     showSignUp,
-    signupHandler,
+    // signupHandler,
     showProfile,
     profileHandler,
   } = useContext(ModelContext);
@@ -38,7 +38,7 @@ const Navbar = () => {
     .toUpperCase();
 
   return (
-    <header className="bg-gray-900">
+    <header className="bg-gray-900 fixed top-0 left-0 right-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex justify-between items-center">
           <span className="flex items-center gap-2 text-gray-200 text-2xl font-bold">
@@ -74,9 +74,9 @@ const Navbar = () => {
             )} */}
 
             <button
-  onClick={loginHandler}
-  className={`${isLoggedIn ? "hidden" : "flex"} items-center gap-1 text-sm py-2 px-5 font-semibold rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition`}
->
+              onClick={loginHandler}
+              className={`${isLoggedIn ? "hidden" : "flex"} items-center gap-1 text-sm py-2 px-5 font-semibold rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition`}
+            >
               LogIn{" "}
               <span className="text-lg">
                 <MdLogin />
