@@ -15,7 +15,7 @@ var usersRouter = require("./routes/users");
 const authRoutes = require("./routes/authRoutes");
 
 var app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 5500;
 
 // lets handle cors policy issue
 const corsOptions = {
