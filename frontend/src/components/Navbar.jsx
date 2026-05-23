@@ -45,7 +45,7 @@ const Navbar = () => {
             <span className="text-blue-500 text-3xl">
               <RiFileList3Fill />
             </span>
-            ToDo List
+            TaskMelt
           </span>
 
           <div className="flex items-center space-x-4">
