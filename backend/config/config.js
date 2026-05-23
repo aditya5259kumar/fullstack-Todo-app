@@ -1,5 +1,6 @@
 require("dotenv").config();
 const fs = require("fs");
+const path = require("path");
 
 module.exports = {
   development: {
@@ -13,7 +14,7 @@ module.exports = {
     dialectOptions: {
       ssl: {
         require: true,
-        ca: fs.readFileSync("./ca.pem"),
+        ca: fs.readFileSync(path.join(__dirname, "../ca.pem")),
       },
     },
 
@@ -31,7 +32,7 @@ module.exports = {
     dialectOptions: {
       ssl: {
         require: true,
-        ca: fs.readFileSync("./ca.pem"),
+       ca: fs.readFileSync(path.join(__dirname, "../ca.pem")),
       },
     },
 
@@ -49,7 +50,7 @@ module.exports = {
     dialectOptions: {
       ssl: {
         require: true,
-        ca: fs.readFileSync("./ca.pem"),
+       ca: fs.readFileSync(path.join(__dirname, "../ca.pem")),
       },
     },
 
